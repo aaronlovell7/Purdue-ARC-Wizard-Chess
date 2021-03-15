@@ -34,6 +34,20 @@ def printBoard():
             pygame.draw.rect(gameDisplay,black,[size,size,boardLength*size,boardLength*size],1)
             pygame.display.update()
 
+def timeStep():
+    start_time = time.time()
+    seconds = 0.1
+
+    while True:
+        current_time = time.time()
+        elapsed_time = current_time - start_time
+    
+        if elapsed_time > seconds:
+            break
+
+
+
+
 pygame.init()
 game = True
 running = True
@@ -55,10 +69,14 @@ while running:
         rB = (5.8*size,7.8*size)
         pygame.draw.polygon(gameDisplay, red, (head,lB,rB))
         pygame.draw.circle(gameDisplay, green, head,5,0)
+        
         pygame.display.update()
         
         #turn triangle to left
-        
+        for i in range(0,10,1):
+            distx = 0.5 * (rB[0]-lB[0])
+            disty = distx
+            timeStep()
         #move the triangle forward
         
         for j in range(0, 101, 1):
@@ -69,15 +87,8 @@ while running:
             pygame.draw.polygon(gameDisplay, red, (head,lB,rB))
             pygame.draw.circle(gameDisplay, green, head, 5, 0)
             pygame.display.update()
-            start_time = time.time()
-            seconds = 0.05
-        
-            while True:
-                current_time = time.time()
-                elapsed_time = current_time - start_time
             
-                if elapsed_time > seconds:
-                    break
+            timeStep()
         game = False
         
     
