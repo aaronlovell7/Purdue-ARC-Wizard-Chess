@@ -72,6 +72,10 @@ while running:
         
         pygame.display.update()
         
+        '''
+        figure out implement turning based on input angle
+        figure out moving forward while oriented at input angle
+        '''
         #turn triangle to left
         for i in range(0,10,1):
             distx = 0.5 * (rB[0]-lB[0])
