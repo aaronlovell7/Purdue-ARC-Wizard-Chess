@@ -72,60 +72,153 @@ def timeStep():
         if elapsed_time > seconds:
             break
 
-def turnRobot(ang, head, lB, rB):
+def turnRobot(ang, head, lB, rB, direction):
     #ang == angle to turn in radians; pos -> clockwise
     #head == current pos of head vertex
     #lB == current pos of left base vertex
     #rB == current pos of right base vertex
-    if ang > 0:
-        #turning clockwise; lB doesnt change
-        step = ang / 100
-        base = rB[0] - lB[0]
-        # side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
-        height = abs(head[1] - lB[1])
-        angle = step
-        for i in range(0,100):
-            #only works right now for angles less than 90 degrees
-            rx = lB[0] + (base * np.cos(angle))
-            ry = lB[1] - (base * np.sin(angle))
-            rB = (rx,ry)
-            # hx = lB[0] - (side * np.cos(angle))
-            # hy = lB[1] + (side * np.sin(angle))
-            # head = (hx,hy)
-            cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
-            hx = cB[0] - height * np.sin(angle)
-            hy = cB[1] - height * np.cos(angle)
-            head = (hx,hy)
-            angle += step
-            printBoard()
-            printPiece(head,lB,rB)
-            timeStep()
-    elif ang < 0:
-        step = ang / 100
-        base = rB[0] - lB[0]
-        # side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
-        height = abs(head[1] - lB[1])
-        angle = step
-        for i in range(0,100):
-            #only works right now for angles less than 90 degrees
-            lx = rB[0] - (base * abs(np.cos(angle)))
-            ly = rB[1] - (base * abs(np.sin(angle)))
-            lB = (lx,ly)
-            # hx = lB[0] - (side * np.cos(angle))
-            # hy = lB[1] + (side * np.sin(angle))
-            # head = (hx,hy)
-            cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
-            hx = cB[0] + height * abs(np.sin(angle))
-            hy = cB[1] - height * abs(np.cos(angle))
-            head = (hx,hy)
-            angle += step
-            printBoard()
-            printPiece(head,lB,rB)
-            timeStep()
+    if direction > 0:
+        if ang > 0:
+            #turning clockwise; lB doesnt change
+            step = ang / 100
+            base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
+            side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
+            angH = np.arccos(base/2/side)
+            height = side * np.sin(angH)
+            angle = step
+            for i in range(0,100):
+                #only works right now for angles less than 90 degrees
+                rx = lB[0] + (base * np.cos(angle))
+                ry = lB[1] - (base * np.sin(angle))
+                rB = (rx,ry)
+                hx = lB[0] + (side * np.cos(angle+angH))
+                hy = lB[1] - (side * np.sin(angle+angH))
+                head = (hx,hy)
+                # cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
+                # hx = cB[0] - height * np.sin(angle)
+                # hy = cB[1] - height * np.cos(angle)
+                head = (hx,hy)
+                angle += step
+                printBoard()
+                printPiece(head,lB,rB)
+                timeStep()
+        elif ang < 0:
+            #turning clockwise; lB doesnt change
+            ang = abs(ang)
+            step = ang / 100
+            base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
+            side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
+            angH = np.arccos(base/2/side)
+            height = side * np.sin(angH)
+            angle = step
+            for i in range(0,100):
+                #only works right now for angles less than 90 degrees
+                lx = rB[0] - (base * np.cos(angle))
+                ly = rB[1] - (base * np.sin(angle))
+                lB = (lx,ly)
+                hx = rB[0] - (side * np.cos(angle+angH))
+                hy = rB[1] - (side * np.sin(angle+angH))
+                head = (hx,hy)
+                # cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
+                # hx = cB[0] - height * np.sin(angle)
+                # hy = cB[1] - height * np.cos(angle)
+                head = (hx,hy)
+                angle += step
+                printBoard()
+                printPiece(head,lB,rB)
+                timeStep()
+    elif direction < 0:
+        if ang > 0:
+            #turning clockwise; lB doesnt change
+            ang = abs(ang)
+            step = ang / 100
+            base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
+            side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
+            angH = np.arccos(base/2/side)
+            height = side * np.sin(angH)
+            angle = ang
+            # angle = step
+            for i in range(0,100):
+                #only works right now for angles less than 90 degrees
+                lx = rB[0] - (base * np.cos(angle))
+                ly = rB[1] - (base * np.sin(angle))
+                lB = (lx,ly)
+                hx = rB[0] - (side * np.cos(angle+angH))
+                hy = rB[1] - (side * np.sin(angle+angH))
+                
+                head = (hx,hy)
+                # cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
+                # hx = cB[0] - height * np.sin(angle)
+                # hy = cB[1] - height * np.cos(angle)
+                head = (hx,hy)
+                angle += -1*step
+                printBoard()
+                printPiece(head,lB,rB)
+                timeStep()
+        elif ang < 0:
+            #turning clockwise; lB doesnt change
+            ang = abs(ang)
+            step = ang / 100
+            base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
+            side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
+            angH = np.arccos(base/2/side)
+            height = side * np.sin(angH)
+            angle = ang
+            for i in range(0,100):
+                #only works right now for angles less than 90 degrees
+                rx = lB[0] + (base * np.cos(angle))
+                ry = lB[1] - (base * np.sin(angle))
+                rB = (rx,ry)
+                hx = lB[0] + (side * np.cos(angle+angH))
+                hy = lB[1] - (side * np.sin(angle+angH))
+                head = (hx,hy)
+                # cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
+                # hx = cB[0] - height * np.sin(angle)
+                # hy = cB[1] - height * np.cos(angle)
+                head = (hx,hy)
+                angle += -1*step
+                printBoard()
+                printPiece(head,lB,rB)
+                timeStep()
     return (head,lB,rB)
 
-def moveForward(dist):
-    return True
+def moveForward(dist, head, lB, rB, direction, ang):
+    if direction > 0:
+        #moving forward
+        step = dist / 100
+        for i in range(0,100):
+            lx = lB[0] - np.sin(ang) * step
+            ly = lB[1] - np.cos(ang) * step
+            rx = rB[0] - np.sin(ang) * step
+            ry = rB[1] - np.cos(ang) * step
+            hx = head[0] - np.sin(ang) * step
+            hy = head[1] - np.cos(ang) * step
+            lB = (lx,ly)
+            rB = (rx,ry)
+            head = (hx,hy)
+            printBoard()
+            printPiece(head,lB,rB)
+            timeStep()
+            
+            
+    elif direction < 0:
+        #moving backwards
+        step = dist / 100
+        for i in range(0,100):
+            lx = lB[0] + np.sin(ang) * step
+            ly = lB[1] + np.cos(ang) * step
+            rx = rB[0] + np.sin(ang) * step
+            ry = rB[1] + np.cos(ang) * step
+            hx = head[0] + np.sin(ang) * step
+            hy = head[1] + np.cos(ang) * step
+            lB = (lx,ly)
+            rB = (rx,ry)
+            head = (hx,hy)
+            printBoard()
+            printPiece(head,lB,rB)
+            timeStep()
+            
+    return (head, lB, rB)
 
 def chessSim():
     global size
@@ -156,33 +249,44 @@ def chessSim():
                 timeStep()
             
             #turn triangle to left
-            ang = np.pi / -4 #hard input angle to turn 45 degrees clockwise
-            pos = turnRobot(ang,head,lB,rB)
+            ang = np.pi / -2 #hard input angle to turn 45 degrees clockwise
+            pos = turnRobot(ang,head,lB,rB,1)
             head = pos[0]
             lB = pos[1]
             rB = pos[2]
             
             #move the triangle forward
+            dist = 50 #hard input distance to 212 cause ≈ 3 diagonal squares
+            direction = -1 #1 if forward, -1 if backwards
+            pos = moveForward(dist, head, lB, rB, direction, ang)
+            head = pos[0]
+            lB = pos[1]
+            rB = pos[2]
             
-            for j in range(0, 101, 1):
-                printBoard()
-                head = (head[0], head[1] - 1)
-                lB = (lB[0],lB[1] - 1)
-                rB = (rB[0],rB[1] - 1)
-                printPiece(head, lB, rB)
-                pygame.display.update()
+            # for j in range(0, 101, 1):
+            #     printBoard()
+            #     head = (head[0], head[1] - 1)
+            #     lB = (lB[0],lB[1] - 1)
+            #     rB = (rB[0],rB[1] - 1)
+            #     printPiece(head, lB, rB)
+            #     pygame.display.update()
                 
-                timeStep()
+            #     timeStep()
                 
             #turn triangle back 
-            # ang = -1 * ang
-            # pos = turnRobot(ang,head,lB,rB)
-            # game = False
+            ang = -1 * ang
+            pos = turnRobot(ang,head,lB,rB, -1)
+            game = False
+                
             
-        
-        
-    pygame.quit()    
+            
+    pygame.quit() 
     
+    
+
+
+
+ 
 #run simulation if this file directly being called by terminal
 if __name__ == '__main__' :
     chessSim()
