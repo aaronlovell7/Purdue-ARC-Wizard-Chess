@@ -238,6 +238,12 @@ def moveRobot(head, lB, rB, ang, dist, direction):
     lB = pos[1]
     rB = pos[2]
 
+def printPieces(pieceLoc):
+    pass
+
+def getTriPoints(coord): #coord in form [row,col]
+    pass
+
 def chessSim():
     global size
     global gameDisplay
@@ -254,38 +260,13 @@ def chessSim():
             global gameDisplay
             printBoard()
                             
-            #hardcode start triangle on e2
+            #hardcode start triangle on e2 --> [6,4] to [3,1]
             head = (5.5*size, 7.2*size)
             lB = (5.2*size,7.8*size)
             rB = (5.8*size,7.8*size)
             
-            moveRobot(head,lB,rB,np.pi/4, 70,-1)
-            # printPiece(head, lB, rB)
+            moveRobot(head,lB,rB,np.pi/4, 70,1)
             
-            # pygame.display.update()
-            
-            # for i in range(0,10):
-            #     timeStep()
-            
-            # #turn triangle to left
-            # ang = np.pi / 4 #hard input angle to turn 45 degrees clockwise
-            # pos = turnRobot(ang,head,lB,rB,1)
-            # head = pos[0]
-            # lB = pos[1]
-            # rB = pos[2]
-            
-            # #move the triangle forward
-            # dist = 212 #hard input distance to 212 cause ≈ 3 diagonal squares
-            # direction = 1 #1 if forward, -1 if backwards
-            # pos = moveForward(dist, head, lB, rB, direction, ang)
-            # head = pos[0]
-            # lB = pos[1]
-            # rB = pos[2]
-            
-                
-            # #turn triangle back 
-            # ang = -1 * ang
-            # pos = turnRobot(ang,head,lB,rB, -1)
             game = False
                 
             
