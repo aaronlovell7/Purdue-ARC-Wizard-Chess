@@ -77,7 +77,7 @@ def printPiece(head, lB, rB):
 
 def timeStep():
     start_time = time.time()
-    seconds = 0.025
+    seconds = 0.25
 
     while True:
         current_time = time.time()
@@ -94,16 +94,17 @@ def turnRobot(ang, p1, direction,pieceLoc):
     head = p1[0]
     lB = p1[1]
     rB = p1[2]
+    time = 20
     if direction > 0:
         if ang > 0:
             #turning clockwise; lB doesnt change
-            step = ang / 100
+            step = ang / time
             base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
             side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
             angH = np.arccos(base/2/side)
             height = side * np.sin(angH)
             angle = step
-            for i in range(0,100):
+            for i in range(0,time+1):
                 #only works right now for angles less than 90 degrees
                 rx = lB[0] + (base * np.cos(angle))
                 ry = lB[1] - (base * np.sin(angle))
@@ -124,13 +125,13 @@ def turnRobot(ang, p1, direction,pieceLoc):
         elif ang < 0:
             #turning clockwise; lB doesnt change
             ang = abs(ang)
-            step = ang / 100
+            step = ang / time
             base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
             side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
             angH = np.arccos(base/2/side)
             height = side * np.sin(angH)
             angle = step
-            for i in range(0,100):
+            for i in range(0,time+1):
                 #only works right now for angles less than 90 degrees
                 lx = rB[0] - (base * np.cos(angle))
                 ly = rB[1] - (base * np.sin(angle))
@@ -152,14 +153,14 @@ def turnRobot(ang, p1, direction,pieceLoc):
         if ang > 0:
             #turning clockwise; lB doesnt change
             ang = abs(ang)
-            step = ang / 100
+            step = ang / time
             base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
             side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
             angH = np.arccos(base/2/side)
             height = side * np.sin(angH)
             angle = ang
             # angle = step
-            for i in range(0,100):
+            for i in range(0,time+1):
                 #only works right now for angles less than 90 degrees
                 lx = rB[0] - (base * np.cos(angle))
                 ly = rB[1] - (base * np.sin(angle))
@@ -181,13 +182,13 @@ def turnRobot(ang, p1, direction,pieceLoc):
         elif ang < 0:
             #turning clockwise; lB doesnt change
             ang = abs(ang)
-            step = ang / 100
+            step = ang / time
             base = np.sqrt((abs(lB[0] - rB[0]))**2 + (abs(lB[1] - rB[1]))**2)
             side = np.sqrt((abs(lB[0] - head[0]))**2 + (abs(lB[1] - head[1]))**2)
             angH = np.arccos(base/2/side)
             height = side * np.sin(angH)
             angle = ang
-            for i in range(0,100):
+            for i in range(0,time+1):
                 #only works right now for angles less than 90 degrees
                 rx = lB[0] + (base * np.cos(angle))
                 ry = lB[1] - (base * np.sin(angle))
@@ -211,10 +212,11 @@ def moveForward(dist, p1, direction, ang,pieceLoc):
     head = p1[0]
     lB = p1[1]
     rB = p1[2]
+    time = 20
     if direction > 0:
         #moving forward
-        step = dist / 100
-        for i in range(0,100):
+        step = dist / time
+        for i in range(0,time):
             lx = lB[0] - np.sin(ang) * step
             ly = lB[1] - np.cos(ang) * step
             rx = rB[0] - np.sin(ang) * step
@@ -234,8 +236,8 @@ def moveForward(dist, p1, direction, ang,pieceLoc):
             
     elif direction < 0:
         #moving backwards
-        step = dist / 100
-        for i in range(0,100):
+        step = dist / time
+        for i in range(0,time):
             lx = lB[0] + np.sin(ang) * step
             ly = lB[1] + np.cos(ang) * step
             rx = rB[0] + np.sin(ang) * step
@@ -268,16 +270,26 @@ def moveRobot(pieceLoc, p1, ang, dist, direction):
     
     printBoard()
     printPieces(pieceLoc)
+    pos = moveForward(10,p1,1,0,pieceLoc)
+    p1[0] = pos[0]
+    p1[1] = pos[1]
+    p1[2] = pos[2]
     pos = turnRobot(ang,p1,1,pieceLoc)
     p1[0] = pos[0]
     p1[1] = pos[1]
     p1[2] = pos[2]
+    timeStep()
     pos = moveForward(dist, p1, direction, ang,pieceLoc)
+    timeStep()
     p1[0] = pos[0]
     p1[1] = pos[1]
     p1[2] = pos[2]
     ang = -1 * ang
     pos = turnRobot(ang,p1, -1,pieceLoc)
+    p1[0] = pos[0]
+    p1[1] = pos[1]
+    p1[2] = pos[2]
+    pos = moveForward(10,p1,-1,0,pieceLoc)
     p1[0] = pos[0]
     p1[1] = pos[1]
     p1[2] = pos[2]
@@ -298,10 +310,10 @@ def getTriPoints(coord): #coord in form [row,col]
     return p1
 
 def setPieces(pieceLoc):
-    p = getTriPoints([6,2])
-    pieceLoc.append(p)
-    p = getTriPoints([6,4])
-    pieceLoc.append(p)
+    for i in range(0,8):
+        for j in range(6,8):
+            p = getTriPoints([j,i])
+            pieceLoc.append(p)
     return pieceLoc
 
 def chessSim():
