@@ -24,6 +24,14 @@ import numpy as np
 global size
 global gameDisplay
 
+'''
+NOTES
+
+haven't tested movement of black pieces
+need to alter code for getTriPoints for black pieces
+need to implement wait for next move
+'''
+
 def printBoard():
             #set color with rgb
             white,black = (255,255,255),(0,0,0)
@@ -57,7 +65,13 @@ def printBoard():
 def printPiece(head, lB, rB):
     red = (255,0,0)
     green = (0,255,0)
-    pygame.draw.polygon(gameDisplay, red, (head,lB,rB))
+    blue = (0,0,255)
+    if head[1] < lB[1]:
+        color = red
+    else:
+        color = blue
+    
+    pygame.draw.polygon(gameDisplay, color, (head,lB,rB))
     pygame.draw.circle(gameDisplay, green, head, 5, 0)
     pygame.display.update()
 
@@ -72,11 +86,14 @@ def timeStep():
         if elapsed_time > seconds:
             break
 
-def turnRobot(ang, head, lB, rB, direction):
+def turnRobot(ang, p1, direction,pieceLoc):
     #ang == angle to turn in radians; pos -> clockwise
     #head == current pos of head vertex
     #lB == current pos of left base vertex
     #rB == current pos of right base vertex
+    head = p1[0]
+    lB = p1[1]
+    rB = p1[2]
     if direction > 0:
         if ang > 0:
             #turning clockwise; lB doesnt change
@@ -91,6 +108,7 @@ def turnRobot(ang, head, lB, rB, direction):
                 rx = lB[0] + (base * np.cos(angle))
                 ry = lB[1] - (base * np.sin(angle))
                 rB = (rx,ry)
+                p1[2] = rB
                 hx = lB[0] + (side * np.cos(angle+angH))
                 hy = lB[1] - (side * np.sin(angle+angH))
                 head = (hx,hy)
@@ -98,9 +116,10 @@ def turnRobot(ang, head, lB, rB, direction):
                 # hx = cB[0] - height * np.sin(angle)
                 # hy = cB[1] - height * np.cos(angle)
                 head = (hx,hy)
+                p1[0] = head
                 angle += step
                 printBoard()
-                printPiece(head,lB,rB)
+                printPieces(pieceLoc)
                 timeStep()
         elif ang < 0:
             #turning clockwise; lB doesnt change
@@ -116,16 +135,18 @@ def turnRobot(ang, head, lB, rB, direction):
                 lx = rB[0] - (base * np.cos(angle))
                 ly = rB[1] - (base * np.sin(angle))
                 lB = (lx,ly)
+                p1[1] = lB
                 hx = rB[0] - (side * np.cos(angle+angH))
                 hy = rB[1] - (side * np.sin(angle+angH))
                 head = (hx,hy)
+                p1[0] = head
                 # cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
                 # hx = cB[0] - height * np.sin(angle)
                 # hy = cB[1] - height * np.cos(angle)
                 head = (hx,hy)
                 angle += step
                 printBoard()
-                printPiece(head,lB,rB)
+                printPieces(pieceLoc)
                 timeStep()
     elif direction < 0:
         if ang > 0:
@@ -143,17 +164,19 @@ def turnRobot(ang, head, lB, rB, direction):
                 lx = rB[0] - (base * np.cos(angle))
                 ly = rB[1] - (base * np.sin(angle))
                 lB = (lx,ly)
+                p1[1] = lB
                 hx = rB[0] - (side * np.cos(angle+angH))
                 hy = rB[1] - (side * np.sin(angle+angH))
                 
                 head = (hx,hy)
+                p1[0] = head
                 # cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
                 # hx = cB[0] - height * np.sin(angle)
                 # hy = cB[1] - height * np.cos(angle)
                 head = (hx,hy)
                 angle += -1*step
                 printBoard()
-                printPiece(head,lB,rB)
+                printPieces(pieceLoc)
                 timeStep()
         elif ang < 0:
             #turning clockwise; lB doesnt change
@@ -169,20 +192,25 @@ def turnRobot(ang, head, lB, rB, direction):
                 rx = lB[0] + (base * np.cos(angle))
                 ry = lB[1] - (base * np.sin(angle))
                 rB = (rx,ry)
+                p1[2] = rB
                 hx = lB[0] + (side * np.cos(angle+angH))
                 hy = lB[1] - (side * np.sin(angle+angH))
                 head = (hx,hy)
+                p1[0] = head
                 # cB = (lB[0] + abs(rB[0] - lB[0])/2, lB[1] - abs(rB[1] - lB[1])/2)
                 # hx = cB[0] - height * np.sin(angle)
                 # hy = cB[1] - height * np.cos(angle)
                 head = (hx,hy)
                 angle += -1*step
                 printBoard()
-                printPiece(head,lB,rB)
+                printPieces(pieceLoc)
                 timeStep()
     return (head,lB,rB)
 
-def moveForward(dist, head, lB, rB, direction, ang):
+def moveForward(dist, p1, direction, ang,pieceLoc):
+    head = p1[0]
+    lB = p1[1]
+    rB = p1[2]
     if direction > 0:
         #moving forward
         step = dist / 100
@@ -196,8 +224,11 @@ def moveForward(dist, head, lB, rB, direction, ang):
             lB = (lx,ly)
             rB = (rx,ry)
             head = (hx,hy)
+            p1[0] = head
+            p1[1] = lB
+            p1[2] = rB
             printBoard()
-            printPiece(head,lB,rB)
+            printPieces(pieceLoc)
             timeStep()
             
             
@@ -214,35 +245,64 @@ def moveForward(dist, head, lB, rB, direction, ang):
             lB = (lx,ly)
             rB = (rx,ry)
             head = (hx,hy)
+            p1[0] = head
+            p1[1] = lB
+            p1[2] = rB
             printBoard()
-            printPiece(head,lB,rB)
+            printPieces(pieceLoc)
             timeStep()
             
     return (head, lB, rB)
 
-def moveRobot(head, lB, rB, ang, dist, direction):
+def moveRobot(pieceLoc, p1, ang, dist, direction):
     #direction == 1 if moving forward, -1 if moving backward
+    for i in pieceLoc:
+        if i == p1:
+            found = True
+            break
+        else:
+            found = False
+    if not found:
+        print("Piece not found on board")
+        return
+    
     printBoard()
-    printPiece(head,lB,rB)
-    pos = turnRobot(ang,head,lB,rB,1)
-    head = pos[0]
-    lB = pos[1]
-    rB = pos[2]
-    pos = moveForward(dist, head, lB, rB, direction, ang)
-    head = pos[0]
-    lB = pos[1]
-    rB = pos[2]
+    printPieces(pieceLoc)
+    pos = turnRobot(ang,p1,1,pieceLoc)
+    p1[0] = pos[0]
+    p1[1] = pos[1]
+    p1[2] = pos[2]
+    pos = moveForward(dist, p1, direction, ang,pieceLoc)
+    p1[0] = pos[0]
+    p1[1] = pos[1]
+    p1[2] = pos[2]
     ang = -1 * ang
-    pos = turnRobot(ang,head,lB,rB, -1)
-    head = pos[0]
-    lB = pos[1]
-    rB = pos[2]
+    pos = turnRobot(ang,p1, -1,pieceLoc)
+    p1[0] = pos[0]
+    p1[1] = pos[1]
+    p1[2] = pos[2]
 
-def printPieces(pieceLoc):
-    pass
+def printPieces(pieceLoc): #pieceLoc is list containing a list for each piece's location points
+    for piece in pieceLoc:
+        printPiece(piece[0],piece[1],piece[2])
+    pygame.display.update()
 
 def getTriPoints(coord): #coord in form [row,col]
-    pass
+    c = coord[0]
+    r = coord[1]
+
+    head = ((r+1+0.5)*size, (c+1+0.2)*size)
+    lB = ((r+1+0.2)*size,(c+1+0.8)*size)
+    rB = ((r+1+0.8)*size,(c+1+0.8)*size)
+    p1 = [head,lB,rB]
+    return p1
+
+def setPieces(pieceLoc):
+    p = getTriPoints([6,2])
+    pieceLoc.append(p)
+    p = getTriPoints([6,4])
+    pieceLoc.append(p)
+    return pieceLoc
 
 def chessSim():
     global size
@@ -259,13 +319,24 @@ def chessSim():
             global size
             global gameDisplay
             printBoard()
-                            
-            #hardcode start triangle on e2 --> [6,4] to [3,1]
-            head = (5.5*size, 7.2*size)
-            lB = (5.2*size,7.8*size)
-            rB = (5.8*size,7.8*size)
-            
-            moveRobot(head,lB,rB,np.pi/4, 70,1)
+            pieceLoc = []
+            pieceLoc = setPieces(pieceLoc)               
+            #hardcode start triangle on e2 and c2
+            #hardcode move triangle on e2 --> [6,4] to [3,1]
+            piece = [6,4]
+            loc = getTriPoints(piece)
+            for p in pieceLoc:
+                if p == loc:
+                    p1 = p
+                    found = True
+                    break
+                else:
+                    found = False
+            if not found:
+                print("Piece not found")
+                pygame.quit()
+                return
+            moveRobot(pieceLoc,p1,np.pi/4, 212,1)
             
             game = False
                 
