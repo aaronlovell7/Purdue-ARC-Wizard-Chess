@@ -75,9 +75,9 @@ def printPiece(head, lB, rB):
     pygame.draw.circle(gameDisplay, green, head, 5, 0)
     pygame.display.update()
 
-def timeStep():
+def timeStep(seconds=0.25):
     start_time = time.time()
-    seconds = 0.25
+    
 
     while True:
         current_time = time.time()
@@ -87,7 +87,7 @@ def timeStep():
             break
 
 def turnRobot(ang, p1, direction,pieceLoc):
-    #ang == angle to turn in radians; pos -> clockwise
+    #ang == angle to turn in radians; pos -> counterclockwise
     #head == current pos of head vertex
     #lB == current pos of left base vertex
     #rB == current pos of right base vertex
@@ -299,22 +299,164 @@ def printPieces(pieceLoc): #pieceLoc is list containing a list for each piece's 
         printPiece(piece[0],piece[1],piece[2])
     pygame.display.update()
 
-def getTriPoints(coord): #coord in form [row,col]
+def getTriPoints(coord, color): #coord in form [row,col]
     c = coord[0]
     r = coord[1]
-
-    head = ((r+1+0.5)*size, (c+1+0.2)*size)
-    lB = ((r+1+0.2)*size,(c+1+0.8)*size)
-    rB = ((r+1+0.8)*size,(c+1+0.8)*size)
+    
+    if color == 'white':
+        head = ((r+1+0.5)*size, (c+1+0.2)*size)
+        lB = ((r+1+0.2)*size,(c+1+0.8)*size)
+        rB = ((r+1+0.8)*size,(c+1+0.8)*size)
+    elif color == 'black':
+        head = ((r+1+0.5)*size, (c+1+0.8)*size)
+        rB = ((r+1+0.2)*size,(c+1+0.2)*size)
+        lB = ((r+1+0.8)*size,(c+1+0.2)*size)
     p1 = [head,lB,rB]
     return p1
 
 def setPieces(pieceLoc):
     for i in range(0,8):
         for j in range(6,8):
-            p = getTriPoints([j,i])
+            p = getTriPoints([j,i], 'white')
+            pieceLoc.append(p)
+    for i in range(0,8):
+        for j in range(0,2):
+            p = getTriPoints([j,i],'black')
             pieceLoc.append(p)
     return pieceLoc
+
+def moveWheels(lV, rV, pieceLoc, p1, color):
+    #lV = velocity for left wheel
+    #rV = velocity for right wheel
+    #think about making velocities list where each value represents 1 second
+    
+    base = np.sqrt((abs(p1[1][0] - p1[2][0]))**2 + (abs(p1[1][1] - p1[2][1]))**2)
+    if color == 'white':
+        for l, r in zip(lV,rV):
+            printBoard()
+            printPieces(pieceLoc)
+            timeStep(1)
+            if abs(l) > abs(r): #moving to the right
+                r1 = (base * r) / (l - r)
+                r2 = base + r1
+                r3 = np.sqrt((base)**2 + (base/2 + r1)**2)
+                ang = l / r2
+                
+                angAxis = np.arctan((p1[2][1] - p1[1][1]) / (p1[2][0] - p1[1][0]))
+                cX = r1 * np.cos(angAxis) + p1[2][0]
+                cY = r1 * np.sin(angAxis) + p1[2][1]
+                angh = abs(np.arctan((p1[0][1] - cY) / (p1[0][0] - cX)))
+                rX = cX - r1 * np.cos(ang + angAxis)
+                rY = cY - r1 * np.sin(ang + angAxis)
+                lX = cX - r2 * np.cos(ang + angAxis)
+                lY = cY - r2 * np.sin(ang+angAxis)
+                hX = cX - r3 * np.cos(ang + angh) 
+                hY = cY - r3 * np.sin(ang + angh)
+                p1[0] = (hX,hY)
+                p1[1] = (lX,lY)
+                p1[2] = (rX,rY)
+            elif abs(l) < abs(r): #moving to the left
+                r1 = (base * l) / (r-l)
+                r2 = base + r1
+                r3 = np.sqrt((base)**2 + (base/2 + r1)**2)
+                ang = r / r2
+                
+                angAxis = np.arctan((p1[1][1] - p1[2][1]) / (p1[2][0] - p1[1][0]))
+                cX = -r1 * np.cos(angAxis) + p1[1][0]
+                cY = r1 * np.sin(angAxis) + p1[1][1]
+                angh = abs(np.arctan((p1[0][1] - cY) / (p1[0][0] - cX)))
+                rX = cX + r2 * np.cos(ang + angAxis)
+                rY = cY - r2 * np.sin(ang + angAxis)
+                lX = cX + r1 * np.cos(ang + angAxis)
+                lY = cY - r1 * np.sin(ang + angAxis)
+                hX = cX + r3 * np.cos(ang + angh) 
+                hY = cY - r3 * np.sin(ang + angh)
+                
+                p1[0] = (hX,hY)
+                p1[1] = (lX,lY)
+                p1[2] = (rX,rY)
+            else: #moving forward/backward
+                ang = np.arccos((p1[2][0]-p1[1][0]) / base)
+                ang = ang if p1[2][1] < p1[1][1] else -1*ang #pos angle -> turning left
+                lx = p1[1][0] - np.sin(ang) * l
+                ly = p1[1][1] - np.cos(ang) * l
+                rx = p1[2][0] - np.sin(ang) * r
+                ry = p1[2][1] - np.cos(ang) * r
+                hx = p1[0][0] - np.sin(ang) * l
+                hy = p1[0][1] - np.cos(ang) * l
+                lB = (lx,ly)
+                rB = (rx,ry)
+                head = (hx,hy)
+                p1[0] = head
+                p1[1] = lB
+                p1[2] = rB
+    elif color == 'black':
+        for l, r in zip(lV,rV):
+            printBoard()
+            printPieces(pieceLoc)
+            timeStep(1)
+            if abs(l) > abs(r): #moving to the right
+                r1 = (base * r) / (l - r)
+                r2 = base + r1
+                r3 = np.sqrt((base)**2 + (base/2 + r1)**2)
+                ang = l / r2
+                
+                angAxis = np.arctan((p1[2][1] - p1[1][1]) / (p1[2][0] - p1[1][0]))
+                cX = -r1 * np.cos(-angAxis) + p1[2][0]
+                cY = r1 * np.sin(-angAxis) + p1[2][1]
+                angh = abs(np.arctan((p1[0][1] - cY) / (p1[0][0] - cX)))
+                # pygame.draw.circle(gameDisplay, (255,0,0), (cX,cY), 5, 0)
+                # pygame.display.update()
+                # timeStep(1)
+                rX = cX + r1 * np.cos(ang + angAxis)
+                rY = cY + r1 * np.sin(ang + angAxis)
+                lX = cX + r2 * np.cos(ang + angAxis)
+                lY = cY + r2 * np.sin(ang + angAxis)
+                hX = cX + r3 * np.cos(ang + angh) 
+                hY = cY + r3 * np.sin(ang + angh)
+                p1[0] = (hX,hY)
+                p1[1] = (lX,lY)
+                p1[2] = (rX,rY)
+            elif abs(l) < abs(r): #moving to the left
+                r1 = (base * l) / (r-l)
+                r2 = base + r1
+                r3 = np.sqrt((base)**2 + (base/2 + r1)**2)
+                ang = r / r2
+                
+                angAxis = np.arctan((p1[2][1] - p1[1][1]) / (p1[1][0] - p1[2][0]))
+                cX = r1 * np.cos(angAxis) + p1[1][0]
+                cY = -r1 * np.sin(angAxis) + p1[1][1]
+                angh = abs(np.arctan((p1[0][1] - cY) / (cX - p1[0][0])))
+                rX = cX - r2 * np.cos(ang + angAxis)
+                rY = cY + r2 * np.sin(ang + angAxis)
+                lX = cX - r1 * np.cos(ang + angAxis)
+                lY = cY + r1 * np.sin(ang + angAxis)
+                hX = cX - r3 * np.cos(ang + angh) 
+                hY = cY + r3 * np.sin(ang + angh)
+                
+                p1[0] = (hX,hY)
+                p1[1] = (lX,lY)
+                p1[2] = (rX,rY)
+            else: #moving forward/backward
+                ang = np.arccos((p1[2][0]-p1[1][0]) / base)
+                ang = ang if p1[2][1] < p1[1][1] else -1*ang #pos angle -> turning left
+                lx = p1[1][0] - np.sin(ang) * l
+                ly = p1[1][1] - np.cos(ang) * l
+                rx = p1[2][0] - np.sin(ang) * r
+                ry = p1[2][1] - np.cos(ang) * r
+                hx = p1[0][0] - np.sin(ang) * l
+                hy = p1[0][1] - np.cos(ang) * l
+                lB = (lx,ly)
+                rB = (rx,ry)
+                head = (hx,hy)
+                p1[0] = head
+                p1[1] = lB
+                p1[2] = rB
+    printBoard()
+    printPieces(pieceLoc)
+    
+
+
 
 def chessSim():
     global size
@@ -335,8 +477,9 @@ def chessSim():
             pieceLoc = setPieces(pieceLoc)               
             #hardcode start triangle on e2 and c2
             #hardcode move triangle on e2 --> [6,4] to [3,1]
-            piece = [6,4]
-            loc = getTriPoints(piece)
+            piece = [1,6] #start coord
+            turn = 'black'
+            loc = getTriPoints(piece, turn)
             for p in pieceLoc:
                 if p == loc:
                     p1 = p
@@ -348,7 +491,54 @@ def chessSim():
                 print("Piece not found")
                 pygame.quit()
                 return
-            moveRobot(pieceLoc,p1,np.pi/4, 212,1)
+            
+            #need to compute angle, distance, and direction
+            
+            #moveRobot(pieceLoc,p1,np.pi/4, 212,1)
+            
+            lV = []
+            rV = []
+            
+            t = 8
+            lV = [5]*t
+            rV = [2]*t
+            temp = [12]*t
+            for a in temp:
+                lV.append(a)
+                rV.append(a)
+            for a in range(t):
+                lV.append(-5)
+                rV.append(-2)
+            
+            for a in range(t):
+                lV.append(2)
+                rV.append(5)
+            for a in range(t):
+                lV.append(18)
+                rV.append(18)
+            for a in range(t):
+                lV.append(-2)
+                rV.append(-5)
+                
+            moveWheels(lV,rV,pieceLoc,p1, turn)
+            
+            piece = [6,2] #start coord
+            turn = 'white'
+            loc = getTriPoints(piece, turn)
+            for p in pieceLoc:
+                if p == loc:
+                    p1 = p
+                    found = True
+                    break
+                else:
+                    found = False
+            if not found:
+                print("Piece not found")
+                pygame.quit()
+                return
+            
+            moveWheels(lV,rV,pieceLoc,p1, turn)
+            
             
             game = False
                 
