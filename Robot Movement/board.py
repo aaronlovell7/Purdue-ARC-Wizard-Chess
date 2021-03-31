@@ -390,6 +390,7 @@ def moveWheels(lV, rV, pieceLoc, p1, color):
                 p1[0] = head
                 p1[1] = lB
                 p1[2] = rB
+            # print(ang)
     elif color == 'black':
         for l, r in zip(lV,rV):
             printBoard()
@@ -452,9 +453,11 @@ def moveWheels(lV, rV, pieceLoc, p1, color):
                 p1[0] = head
                 p1[1] = lB
                 p1[2] = rB
+            # print(ang)
     printBoard()
     printPieces(pieceLoc)
     
+    return ang
 
 
 
@@ -499,45 +502,45 @@ def chessSim():
             lV = []
             rV = []
             
-            t = 8
+            t = 5
             lV = [5]*t
             rV = [2]*t
             temp = [12]*t
             for a in temp:
                 lV.append(a)
                 rV.append(a)
-            for a in range(t):
+            for a in range(10):
                 lV.append(-5)
                 rV.append(-2)
             
-            for a in range(t):
-                lV.append(2)
-                rV.append(5)
-            for a in range(t):
-                lV.append(18)
-                rV.append(18)
-            for a in range(t):
-                lV.append(-2)
-                rV.append(-5)
+            # for a in range(t):
+            #     lV.append(2)
+            #     rV.append(5)
+            # for a in range(t):
+            #     lV.append(18)
+            #     rV.append(18)
+            # for a in range(t):
+            #     lV.append(-2)
+            #     rV.append(-5)
                 
             moveWheels(lV,rV,pieceLoc,p1, turn)
             
-            piece = [6,2] #start coord
-            turn = 'white'
-            loc = getTriPoints(piece, turn)
-            for p in pieceLoc:
-                if p == loc:
-                    p1 = p
-                    found = True
-                    break
-                else:
-                    found = False
-            if not found:
-                print("Piece not found")
-                pygame.quit()
-                return
+            # piece = [6,2] #start coord
+            # turn = 'white'
+            # loc = getTriPoints(piece, turn)
+            # for p in pieceLoc:
+            #     if p == loc:
+            #         p1 = p
+            #         found = True
+            #         break
+            #     else:
+            #         found = False
+            # if not found:
+            #     print("Piece not found")
+            #     pygame.quit()
+            #     return
             
-            moveWheels(lV,rV,pieceLoc,p1, turn)
+            # moveWheels(lV,rV,pieceLoc,p1, turn)
             
             
             game = False
